@@ -1,5 +1,9 @@
 # TaskFlow
 
+## Participantes
+
+Eduardo Cunha Borges & Luiz Felipe Vilhena
+
 Projeto inicial para o sistema de organizacao e acompanhamento de tarefas.
 
 ## Backend (API)
