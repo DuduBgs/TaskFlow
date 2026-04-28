@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TaskFlow</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">TaskFlow</p>
+          <h1>Gerencie tarefas com foco.</h1>
+          <p class="lead">Login, crie tarefas e acompanhe o progresso em tempo real.</p>
+        </div>
+        <div class="status" id="statusBox">Desconectado</div>
+      </header>
+
+      <main class="grid">
+        <section class="card">
+          <h2>Registrar</h2>
+          <form id="registerForm">
+            <label>
+              Nome
+              <input type="text" name="name" required />
+            </label>
+            <label>
+              Email
+              <input type="email" name="email" required />
+            </label>
+            <label>
+              Senha
+              <input type="password" name="password" required />
+            </label>
+            <button type="submit">Criar conta</button>
+          </form>
+        </section>
+
+        <section class="card">
+          <h2>Entrar</h2>
+          <form id="loginForm">
+            <label>
+              Email
+              <input type="email" name="email" required />
+            </label>
+            <label>
+              Senha
+              <input type="password" name="password" required />
+            </label>
+            <button type="submit">Entrar</button>
+          </form>
+          <button class="ghost" id="logoutButton" type="button">Sair</button>
+        </section>
+
+        <section class="card card-wide">
+          <div class="card-header">
+            <h2>Nova tarefa</h2>
+            <button class="ghost" id="refreshButton" type="button">Recarregar</button>
+          </div>
+          <form id="taskForm" class="task-form">
+            <label>
+              Titulo
+              <input type="text" name="title" required />
+            </label>
+            <label>
+              Descricao
+              <input type="text" name="description" />
+            </label>
+            <label>
+              Prazo
+              <input type="date" name="dueDate" />
+            </label>
+            <label>
+              Status
+              <select name="status">
+                <option value="pendente">Pendente</option>
+                <option value="em andamento">Em andamento</option>
+                <option value="concluida">Concluida</option>
+              </select>
+            </label>
+            <label>
+              Responsavel
+              <input type="text" name="assignee" />
+            </label>
+            <button type="submit">Salvar tarefa</button>
+          </form>
+        </section>
+
+        <section class="card card-wide">
+          <h2>Lista de tarefas</h2>
+          <div id="tasks" class="tasks"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
