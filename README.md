@@ -1,10 +1,10 @@
 # TaskFlow
 
+Projeto inicial para o sistema de organizacao e acompanhamento de tarefas.
+
 ## Participantes
 
 Eduardo Cunha Borges & Luiz Felipe Vilhena
-
-Projeto inicial para o sistema de organizacao e acompanhamento de tarefas.
 
 ## Backend (API)
 A API cobre o CRUD de tarefas em memoria, usa PostgreSQL quando `DATABASE_URL` estiver definida e possui autenticacao via JWT.
