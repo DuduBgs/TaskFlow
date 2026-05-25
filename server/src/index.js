@@ -25,7 +25,9 @@ app.use("/api/tasks", requireAuth, tasksRouter);
 
 export default app;
 
-const port = Number(process.env.PORT || 3000);
-app.listen(port, () => {
-  console.log(`TaskFlow API listening on port ${port}`);
-});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  const port = Number(process.env.PORT || 3000);
+  app.listen(port, () => {
+    console.log(`TaskFlow API listening on port ${port}`);
+  });
+}
