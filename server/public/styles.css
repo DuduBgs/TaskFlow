@@ -216,6 +216,18 @@ button.ghost {
   box-shadow: 0 6px 20px rgba(20, 18, 16, 0.14);
 }
 
+.kanban-card.dragging {
+  opacity: 0.4;
+  cursor: grabbing;
+}
+
+.column-cards.drag-over {
+  background: rgba(224, 79, 42, 0.06);
+  border-radius: 10px;
+  outline: 2px dashed var(--accent);
+  outline-offset: 4px;
+}
+
 .card-title {
   font-weight: 700;
   font-size: 0.95rem;

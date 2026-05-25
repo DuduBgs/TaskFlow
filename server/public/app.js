@@ -10,6 +10,7 @@ const closeModalButton = document.getElementById("closeModalButton");
 
 let token = localStorage.getItem("taskflow_token") || "";
 let currentTasks = [];
+let draggedId = null;
 
 const COLUMNS = {
   "pendente":     { cardsId: "col-pendente",      countId: "count-pendente" },
@@ -63,6 +64,16 @@ function buildCard(task) {
   const card = document.createElement("div");
   card.className = "kanban-card";
   card.dataset.id = task.id;
+  card.draggable = true;
+
+  card.addEventListener("dragstart", () => {
+    draggedId = String(task.id);
+    card.classList.add("dragging");
+  });
+
+  card.addEventListener("dragend", () => {
+    card.classList.remove("dragging");
+  });
 
   card.innerHTML = `
     <div class="card-title">${escape(task.title)}</div>
@@ -111,8 +122,30 @@ async function loadTasks() {
       });
     }
 
-    Object.entries(COLUMNS).forEach(([status, { countId }]) => {
+    Object.entries(COLUMNS).forEach(([status, { countId, cardsId }]) => {
       document.getElementById(countId).textContent = counts[status];
+
+      const col = document.getElementById(cardsId);
+      col.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        col.classList.add("drag-over");
+      });
+      col.addEventListener("dragleave", () => col.classList.remove("drag-over"));
+      col.addEventListener("drop", async () => {
+        col.classList.remove("drag-over");
+        if (!draggedId) return;
+        const task = currentTasks.find((t) => String(t.id) === draggedId);
+        if (!task || task.status === status) return;
+        try {
+          await request(`/api/tasks/${draggedId}`, {
+            method: "PUT",
+            body: JSON.stringify({ status })
+          });
+          await loadTasks();
+        } catch (error) {
+          setStatus(error.message);
+        }
+      });
     });
   } catch (error) {
     setEmptyColumns(error.message);
