@@ -10,29 +10,37 @@
   --shadow: 0 20px 45px rgba(20, 18, 16, 0.12);
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
   font-family: "Space Grotesk", "Trebuchet MS", sans-serif;
   color: var(--ink);
   background: radial-gradient(circle at top, var(--bg-accent), var(--bg));
+  min-height: 100vh;
 }
 
-.page {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 48px 24px 72px;
-}
+.hidden { display: none !important; }
 
-.hero {
+/* ── Auth Screen ─────────────────────────────────────────────────────────── */
+
+.auth-screen {
+  min-height: 100vh;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 40px;
+  justify-content: center;
+  padding: 24px;
+}
+
+.auth-card {
+  background: var(--card);
+  border-radius: 24px;
+  padding: 40px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  width: 100%;
+  max-width: 420px;
+  animation: fadeUp 0.5s ease;
 }
 
 .eyebrow {
@@ -41,18 +49,94 @@ body {
   text-transform: uppercase;
   color: var(--muted);
   margin: 0 0 12px;
+  font-size: 0.8rem;
 }
 
-h1 {
-  font-size: clamp(2.4rem, 3vw, 3.6rem);
-  margin: 0 0 12px;
+.auth-card h1 {
+  font-size: 2rem;
+  margin: 0 0 6px;
 }
 
-.lead {
-  max-width: 520px;
-  font-size: 1.1rem;
+.auth-lead {
   color: var(--muted);
+  font-size: 0.95rem;
+  margin: 0 0 28px;
 }
+
+.auth-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 24px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 9px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 600;
+  font-family: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  width: auto;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.tab-btn.active {
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: 0 2px 8px rgba(20, 18, 16, 0.1);
+}
+
+.tab-btn:hover {
+  background: var(--card);
+  transform: none;
+}
+
+.auth-form label {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+}
+
+.auth-error {
+  margin: 12px 0 0;
+  font-size: 0.85rem;
+  color: #842029;
+  min-height: 18px;
+  text-align: center;
+}
+
+/* ── App Screen ──────────────────────────────────────────────────────────── */
+
+.app-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  height: 60px;
+}
+
+.app-logo { margin: 0; }
 
 .header-right {
   display: flex;
@@ -60,44 +144,18 @@ h1 {
   gap: 12px;
 }
 
-.user-avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: #fff;
+.app-content {
+  flex: 1;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 24px 72px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.78rem;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: var(--shadow);
-  transition: background 0.2s ease, transform 0.2s ease;
-  flex-shrink: 0;
-}
-
-.user-avatar:hover {
-  background: var(--accent-dark);
-  transform: scale(1.08);
-}
-
-.status {
-  padding: 12px 20px;
-  border-radius: 999px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  font-weight: 600;
-  white-space: nowrap;
-  animation: floatIn 0.8s ease;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  flex-direction: column;
   gap: 24px;
 }
+
+/* ── Cards ───────────────────────────────────────────────────────────────── */
 
 .card {
   background: var(--card);
@@ -108,10 +166,6 @@ h1 {
   animation: fadeUp 0.6s ease;
 }
 
-.card-wide {
-  grid-column: 1 / -1;
-}
-
 .card-header {
   display: flex;
   justify-content: space-between;
@@ -120,10 +174,9 @@ h1 {
   margin-bottom: 16px;
 }
 
-h2 {
-  margin: 0 0 16px;
-  font-size: 1.4rem;
-}
+h2 { margin: 0 0 16px; font-size: 1.4rem; }
+
+/* ── Forms ───────────────────────────────────────────────────────────────── */
 
 label {
   display: grid;
@@ -132,8 +185,7 @@ label {
   font-size: 0.9rem;
 }
 
-input,
-select {
+input, select {
   padding: 12px 14px;
   border-radius: 12px;
   border: 1px solid var(--border);
@@ -149,6 +201,7 @@ button {
   background: var(--accent);
   color: #fff;
   font-weight: 600;
+  font-family: inherit;
   cursor: pointer;
   transition: transform 0.2s ease, background 0.2s ease;
 }
@@ -171,7 +224,31 @@ button.ghost {
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 
-/* ── Board Controls ── */
+/* ── Avatar ──────────────────────────────────────────────────────────────── */
+
+.user-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(224, 79, 42, 0.3);
+  transition: background 0.2s ease, transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.user-avatar:hover {
+  background: var(--accent-dark);
+  transform: scale(1.08);
+}
+
+/* ── Board Controls ──────────────────────────────────────────────────────── */
 
 .board-controls {
   display: flex;
@@ -194,7 +271,7 @@ button.ghost {
   outline-offset: 2px;
 }
 
-/* ── Kanban Board ── */
+/* ── Kanban ──────────────────────────────────────────────────────────────── */
 
 .kanban {
   display: grid;
@@ -250,7 +327,7 @@ button.ghost {
   padding: 32px 0;
 }
 
-/* ── Kanban Card ── */
+/* ── Kanban Card ─────────────────────────────────────────────────────────── */
 
 .kanban-card {
   background: var(--card);
@@ -279,19 +356,6 @@ button.ghost {
   outline-offset: 4px;
 }
 
-.badge {
-  display: inline-block;
-  padding: 1px 7px;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  margin-left: 6px;
-  vertical-align: middle;
-}
-
-.badge-atrasado { background: #f8d7da; color: #842029; }
-.badge-urgente  { background: #fff3cd; color: #7d5f00; }
-
 .card-title {
   font-weight: 700;
   font-size: 0.95rem;
@@ -313,10 +377,7 @@ button.ghost {
   margin-bottom: 10px;
 }
 
-.card-due {
-  font-size: 0.78rem;
-  color: var(--muted);
-}
+.card-due { font-size: 0.78rem; color: var(--muted); }
 
 .card-assignee {
   width: 28px;
@@ -332,17 +393,29 @@ button.ghost {
   flex-shrink: 0;
 }
 
-.card-actions {
-  display: flex;
-  gap: 6px;
-}
+.card-actions { display: flex; gap: 6px; }
 
 .card-actions .ghost {
   padding: 4px 10px;
   font-size: 0.78rem;
 }
 
-/* ── Modal ── */
+/* ── Badges ──────────────────────────────────────────────────────────────── */
+
+.badge {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.badge-atrasado { background: #f8d7da; color: #842029; }
+.badge-urgente  { background: #fff3cd; color: #7d5f00; }
+
+/* ── Modal ───────────────────────────────────────────────────────────────── */
 
 .modal-overlay {
   display: none;
@@ -355,9 +428,7 @@ button.ghost {
   padding: 24px;
 }
 
-.modal-overlay.open {
-  display: flex;
-}
+.modal-overlay.open { display: flex; }
 
 .modal {
   background: var(--card);
@@ -377,41 +448,25 @@ button.ghost {
   margin-bottom: 20px;
 }
 
-.modal-header h2 {
-  margin: 0;
-}
+.modal-header h2 { margin: 0; }
 
-/* ── Animations ── */
+/* ── Animations ──────────────────────────────────────────────────────────── */
 
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(14px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes floatIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ── Responsive ── */
+/* ── Responsive ──────────────────────────────────────────────────────────── */
 
 @media (max-width: 900px) {
-  .kanban {
-    grid-template-columns: 1fr;
-  }
+  .kanban { grid-template-columns: 1fr; }
+  .search-input { width: 180px; }
 }
 
 @media (max-width: 720px) {
-  .hero {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .status {
-    width: 100%;
-  }
-
-  button.ghost {
-    width: 100%;
-  }
+  .app-header { padding: 0 16px; }
+  .app-content { padding: 20px 16px 48px; }
+  .auth-card { padding: 28px 20px; }
+  .board-controls { flex-wrap: wrap; }
 }
