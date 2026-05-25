@@ -23,6 +23,8 @@ app.get("/health", (req, res) => {
 app.use("/api/auth", authRouter);
 app.use("/api/tasks", requireAuth, tasksRouter);
 
+export default app;
+
 const port = Number(process.env.PORT || 3000);
 app.listen(port, () => {
   console.log(`TaskFlow API listening on port ${port}`);
