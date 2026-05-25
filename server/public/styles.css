@@ -251,6 +251,19 @@ button.ghost {
   outline-offset: 4px;
 }
 
+.badge {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.badge-atrasado { background: #f8d7da; color: #842029; }
+.badge-urgente  { background: #fff3cd; color: #7d5f00; }
+
 .card-title {
   font-weight: 700;
   font-size: 0.95rem;

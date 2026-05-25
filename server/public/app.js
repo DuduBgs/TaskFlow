@@ -27,6 +27,17 @@ function escape(str) {
     .replace(/"/g, "&quot;");
 }
 
+function dueBadge(dueDate, status) {
+  if (!dueDate || status === "concluida") return "";
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const due = new Date(dueDate + "T00:00:00");
+  const diff = Math.ceil((due - today) / 86400000);
+  if (diff < 0) return '<span class="badge badge-atrasado">Atrasado</span>';
+  if (diff <= 3) return '<span class="badge badge-urgente">Urgente</span>';
+  return "";
+}
+
 function initials(name) {
   if (!name) return "?";
   return name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
@@ -77,7 +88,7 @@ function buildCard(task) {
   });
 
   card.innerHTML = `
-    <div class="card-title">${escape(task.title)}</div>
+    <div class="card-title">${escape(task.title)}${dueBadge(task.dueDate, task.status)}</div>
     ${task.description ? `<div class="card-desc">${escape(task.description)}</div>` : ""}
     <div class="card-footer">
       <span class="card-due">${task.dueDate ? "&#128197; " + escape(task.dueDate) : ""}</span>
