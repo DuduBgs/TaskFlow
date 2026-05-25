@@ -4,9 +4,31 @@ const loginForm = document.getElementById("loginForm");
 const logoutButton = document.getElementById("logoutButton");
 const taskForm = document.getElementById("taskForm");
 const refreshButton = document.getElementById("refreshButton");
-const tasksContainer = document.getElementById("tasks");
+const editModal = document.getElementById("editModal");
+const editForm = document.getElementById("editForm");
+const closeModalButton = document.getElementById("closeModalButton");
 
 let token = localStorage.getItem("taskflow_token") || "";
+let currentTasks = [];
+
+const COLUMNS = {
+  "pendente":     { cardsId: "col-pendente",      countId: "count-pendente" },
+  "em andamento": { cardsId: "col-em-andamento",  countId: "count-andamento" },
+  "concluida":    { cardsId: "col-concluida",      countId: "count-concluida" }
+};
+
+function escape(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function initials(name) {
+  if (!name) return "?";
+  return name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+}
 
 function setStatus(message, isAuthed = false) {
   statusBox.textContent = message;
@@ -25,47 +47,125 @@ function setToken(value) {
 async function request(path, options = {}) {
   const headers = new Headers(options.headers || {});
   headers.set("Content-Type", "application/json");
-  if (token) {
-    headers.set("Authorization", `Bearer ${token}`);
-  }
+  if (token) headers.set("Authorization", `Bearer ${token}`);
 
   const response = await fetch(path, { ...options, headers });
   const payload = await response.json().catch(() => null);
 
   if (!response.ok) {
-    const message = payload?.error || "Falha na requisicao";
-    throw new Error(message);
+    throw new Error(payload?.error || "Falha na requisicao");
   }
 
   return payload;
 }
 
+function buildCard(task) {
+  const card = document.createElement("div");
+  card.className = "kanban-card";
+  card.dataset.id = task.id;
+
+  card.innerHTML = `
+    <div class="card-title">${escape(task.title)}</div>
+    ${task.description ? `<div class="card-desc">${escape(task.description)}</div>` : ""}
+    <div class="card-footer">
+      <span class="card-due">${task.dueDate ? "&#128197; " + escape(task.dueDate) : ""}</span>
+      <div class="card-assignee" title="${escape(task.assignee || "Sem responsavel")}">${initials(task.assignee)}</div>
+    </div>
+    <div class="card-actions">
+      <button class="ghost btn-edit" data-id="${task.id}" type="button">Editar</button>
+      <button class="ghost btn-delete" data-id="${task.id}" type="button">Excluir</button>
+    </div>
+  `;
+
+  card.querySelector(".btn-edit").addEventListener("click", () => openEditModal(task));
+  card.querySelector(".btn-delete").addEventListener("click", () => handleDeleteTask(task.id));
+
+  return card;
+}
+
+function setEmptyColumns(message) {
+  Object.values(COLUMNS).forEach(({ cardsId }) => {
+    document.getElementById(cardsId).innerHTML = `<p class="empty-col">${message}</p>`;
+  });
+}
+
 async function loadTasks() {
-  tasksContainer.innerHTML = "<p>Carregando...</p>";
+  setEmptyColumns("Carregando...");
 
   try {
     const payload = await request("/api/tasks");
-    const tasks = payload.data || [];
+    currentTasks = payload.data || [];
 
-    if (!tasks.length) {
-      tasksContainer.innerHTML = "<p>Nenhuma tarefa cadastrada.</p>";
-      return;
+    const counts = { "pendente": 0, "em andamento": 0, "concluida": 0 };
+    Object.values(COLUMNS).forEach(({ cardsId }) => {
+      document.getElementById(cardsId).innerHTML = "";
+    });
+
+    if (!currentTasks.length) {
+      setEmptyColumns("Nenhuma tarefa");
+    } else {
+      currentTasks.forEach((task) => {
+        const status = task.status in COLUMNS ? task.status : "pendente";
+        counts[status]++;
+        document.getElementById(COLUMNS[status].cardsId).appendChild(buildCard(task));
+      });
     }
 
-    tasksContainer.innerHTML = tasks
-      .map(
-        (task) => `
-      <div class="task">
-        <strong>${task.title}</strong>
-        <small>${task.status} ${task.dueDate ? "| " + task.dueDate : ""}</small>
-        <span>${task.description || "Sem descricao"}</span>
-        <small>${task.assignee ? "Responsavel: " + task.assignee : "Sem responsavel"}</small>
-      </div>
-    `
-      )
-      .join("");
+    Object.entries(COLUMNS).forEach(([status, { countId }]) => {
+      document.getElementById(countId).textContent = counts[status];
+    });
   } catch (error) {
-    tasksContainer.innerHTML = `<p>${error.message}</p>`;
+    setEmptyColumns(error.message);
+  }
+}
+
+function openEditModal(task) {
+  editForm.elements.id.value = task.id;
+  editForm.elements.title.value = task.title;
+  editForm.elements.description.value = task.description || "";
+  editForm.elements.dueDate.value = task.dueDate || "";
+  editForm.elements.status.value = task.status;
+  editForm.elements.assignee.value = task.assignee || "";
+  editModal.classList.add("open");
+}
+
+function closeEditModal() {
+  editModal.classList.remove("open");
+  editForm.reset();
+}
+
+async function handleEditTask(event) {
+  event.preventDefault();
+  const formData = new FormData(editForm);
+  const id = formData.get("id");
+
+  try {
+    await request(`/api/tasks/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        title: formData.get("title"),
+        description: formData.get("description"),
+        dueDate: formData.get("dueDate"),
+        status: formData.get("status"),
+        assignee: formData.get("assignee")
+      })
+    });
+
+    closeEditModal();
+    await loadTasks();
+  } catch (error) {
+    setStatus(error.message);
+  }
+}
+
+async function handleDeleteTask(id) {
+  if (!confirm("Tem certeza que deseja excluir esta tarefa?")) return;
+
+  try {
+    await request(`/api/tasks/${id}`, { method: "DELETE" });
+    await loadTasks();
+  } catch (error) {
+    setStatus(error.message);
   }
 }
 
@@ -116,8 +216,9 @@ async function handleLogin(event) {
 
 async function handleLogout() {
   setToken("");
-  tasksContainer.innerHTML = "<p>Desconectado.</p>";
+  currentTasks = [];
   setStatus("Desconectado");
+  setEmptyColumns("Faca login para ver tarefas.");
 }
 
 async function handleCreateTask(event) {
@@ -149,7 +250,7 @@ function init() {
     loadTasks();
   } else {
     setStatus("Desconectado");
-    tasksContainer.innerHTML = "<p>Faca login para ver tarefas.</p>";
+    setEmptyColumns("Faca login para ver tarefas.");
   }
 }
 
@@ -158,5 +259,10 @@ loginForm.addEventListener("submit", handleLogin);
 logoutButton.addEventListener("click", handleLogout);
 taskForm.addEventListener("submit", handleCreateTask);
 refreshButton.addEventListener("click", loadTasks);
+editForm.addEventListener("submit", handleEditTask);
+closeModalButton.addEventListener("click", closeEditModal);
+editModal.addEventListener("click", (e) => {
+  if (e.target === editModal) closeEditModal();
+});
 
 init();

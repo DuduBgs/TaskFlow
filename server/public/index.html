@@ -60,10 +60,7 @@
         </section>
 
         <section class="card card-wide">
-          <div class="card-header">
-            <h2>Nova tarefa</h2>
-            <button class="ghost" id="refreshButton" type="button">Recarregar</button>
-          </div>
+          <h2>Nova tarefa</h2>
           <form id="taskForm" class="task-form">
             <label>
               Titulo
@@ -94,10 +91,72 @@
         </section>
 
         <section class="card card-wide">
-          <h2>Lista de tarefas</h2>
-          <div id="tasks" class="tasks"></div>
+          <div class="card-header">
+            <h2>Quadro Kanban</h2>
+            <button class="ghost" id="refreshButton" type="button">Recarregar</button>
+          </div>
+          <div class="kanban">
+            <div class="kanban-column">
+              <div class="column-header pendente-header">
+                <span class="column-title">Pendente</span>
+                <span class="column-count" id="count-pendente">0</span>
+              </div>
+              <div class="column-cards" id="col-pendente"></div>
+            </div>
+            <div class="kanban-column">
+              <div class="column-header andamento-header">
+                <span class="column-title">Em Andamento</span>
+                <span class="column-count" id="count-andamento">0</span>
+              </div>
+              <div class="column-cards" id="col-em-andamento"></div>
+            </div>
+            <div class="kanban-column">
+              <div class="column-header concluida-header">
+                <span class="column-title">Concluida</span>
+                <span class="column-count" id="count-concluida">0</span>
+              </div>
+              <div class="column-cards" id="col-concluida"></div>
+            </div>
+          </div>
         </section>
       </main>
+    </div>
+
+    <div class="modal-overlay" id="editModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>Editar tarefa</h2>
+          <button class="ghost" id="closeModalButton" type="button">Fechar</button>
+        </div>
+        <form id="editForm" class="task-form">
+          <input type="hidden" name="id" />
+          <label>
+            Titulo
+            <input type="text" name="title" required />
+          </label>
+          <label>
+            Descricao
+            <input type="text" name="description" />
+          </label>
+          <label>
+            Prazo
+            <input type="date" name="dueDate" />
+          </label>
+          <label>
+            Status
+            <select name="status">
+              <option value="pendente">Pendente</option>
+              <option value="em andamento">Em andamento</option>
+              <option value="concluida">Concluida</option>
+            </select>
+          </label>
+          <label>
+            Responsavel
+            <input type="text" name="assignee" />
+          </label>
+          <button type="submit">Salvar alteracoes</button>
+        </form>
+      </div>
     </div>
 
     <script src="app.js"></script>
