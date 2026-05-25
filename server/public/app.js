@@ -7,6 +7,7 @@ const refreshButton = document.getElementById("refreshButton");
 const editModal = document.getElementById("editModal");
 const editForm = document.getElementById("editForm");
 const closeModalButton = document.getElementById("closeModalButton");
+const searchInput = document.getElementById("searchInput");
 
 let token = localStorage.getItem("taskflow_token") || "";
 let currentTasks = [];
@@ -94,6 +95,16 @@ function buildCard(task) {
   return card;
 }
 
+function filterTasks(tasks) {
+  const query = searchInput.value.trim().toLowerCase();
+  if (!query) return tasks;
+  return tasks.filter(
+    (t) =>
+      t.title.toLowerCase().includes(query) ||
+      (t.assignee && t.assignee.toLowerCase().includes(query))
+  );
+}
+
 function setEmptyColumns(message) {
   Object.values(COLUMNS).forEach(({ cardsId }) => {
     document.getElementById(cardsId).innerHTML = `<p class="empty-col">${message}</p>`;
@@ -112,10 +123,12 @@ async function loadTasks() {
       document.getElementById(cardsId).innerHTML = "";
     });
 
-    if (!currentTasks.length) {
-      setEmptyColumns("Nenhuma tarefa");
+    const visible = filterTasks(currentTasks);
+
+    if (!visible.length) {
+      setEmptyColumns(currentTasks.length ? "Nenhum resultado para a busca." : "Nenhuma tarefa");
     } else {
-      currentTasks.forEach((task) => {
+      visible.forEach((task) => {
         const status = task.status in COLUMNS ? task.status : "pendente";
         counts[status]++;
         document.getElementById(COLUMNS[status].cardsId).appendChild(buildCard(task));
@@ -123,7 +136,10 @@ async function loadTasks() {
     }
 
     Object.entries(COLUMNS).forEach(([status, { countId, cardsId }]) => {
-      document.getElementById(countId).textContent = counts[status];
+      document.getElementById(countId).textContent =
+        searchInput.value.trim()
+          ? (document.getElementById(cardsId).querySelectorAll(".kanban-card").length)
+          : counts[status];
 
       const col = document.getElementById(cardsId);
       col.addEventListener("dragover", (e) => {
@@ -292,6 +308,7 @@ loginForm.addEventListener("submit", handleLogin);
 logoutButton.addEventListener("click", handleLogout);
 taskForm.addEventListener("submit", handleCreateTask);
 refreshButton.addEventListener("click", loadTasks);
+searchInput.addEventListener("input", loadTasks);
 editForm.addEventListener("submit", handleEditTask);
 closeModalButton.addEventListener("click", closeEditModal);
 editModal.addEventListener("click", (e) => {
