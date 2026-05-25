@@ -8,6 +8,7 @@ const editModal = document.getElementById("editModal");
 const editForm = document.getElementById("editForm");
 const closeModalButton = document.getElementById("closeModalButton");
 const searchInput = document.getElementById("searchInput");
+const userAvatar = document.getElementById("userAvatar");
 
 let token = localStorage.getItem("taskflow_token") || "";
 let currentTasks = [];
@@ -46,6 +47,16 @@ function initials(name) {
 function setStatus(message, isAuthed = false) {
   statusBox.textContent = message;
   statusBox.style.borderColor = isAuthed ? "#e04f2a" : "rgba(20, 18, 16, 0.12)";
+}
+
+function setUserAvatar(name) {
+  if (name) {
+    userAvatar.textContent = initials(name);
+    userAvatar.title = `${name} — clique para sair`;
+    userAvatar.style.display = "flex";
+  } else {
+    userAvatar.style.display = "none";
+  }
 }
 
 function setToken(value) {
@@ -245,6 +256,7 @@ async function handleRegister(event) {
 
     setToken(payload.token);
     setStatus(`Conectado: ${payload.data.name}`, true);
+    setUserAvatar(payload.data.name);
     await loadTasks();
     registerForm.reset();
   } catch (error) {
@@ -267,6 +279,7 @@ async function handleLogin(event) {
 
     setToken(payload.token);
     setStatus(`Conectado: ${payload.data.name}`, true);
+    setUserAvatar(payload.data.name);
     await loadTasks();
     loginForm.reset();
   } catch (error) {
@@ -278,6 +291,7 @@ async function handleLogout() {
   setToken("");
   currentTasks = [];
   setStatus("Desconectado");
+  setUserAvatar(null);
   setEmptyColumns("Faca login para ver tarefas.");
 }
 
@@ -325,5 +339,6 @@ closeModalButton.addEventListener("click", closeEditModal);
 editModal.addEventListener("click", (e) => {
   if (e.target === editModal) closeEditModal();
 });
+userAvatar.addEventListener("click", handleLogout);
 
 init();
