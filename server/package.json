@@ -6,7 +6,7 @@
   "main": "src/index.js",
   "scripts": {
     "dev": "node src/index.js",
-    "test": "node --test"
+    "test": "node --experimental-test-coverage --test"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
