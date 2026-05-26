@@ -169,6 +169,56 @@ async function handleDeleteTask(id) {
   }
 }
 
+function openEditModal(task) {
+  editForm.elements.id.value = task.id;
+  editForm.elements.title.value = task.title;
+  editForm.elements.description.value = task.description || "";
+  editForm.elements.dueDate.value = task.dueDate || "";
+  editForm.elements.status.value = task.status;
+  editForm.elements.assignee.value = task.assignee || "";
+  editModal.classList.add("open");
+}
+
+function closeEditModal() {
+  editModal.classList.remove("open");
+  editForm.reset();
+}
+
+async function handleEditTask(event) {
+  event.preventDefault();
+  const formData = new FormData(editForm);
+  const id = formData.get("id");
+
+  try {
+    await request(`/api/tasks/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        title: formData.get("title"),
+        description: formData.get("description"),
+        dueDate: formData.get("dueDate"),
+        status: formData.get("status"),
+        assignee: formData.get("assignee")
+      })
+    });
+
+    closeEditModal();
+    await loadTasks();
+  } catch (error) {
+    setStatus(error.message);
+  }
+}
+
+async function handleDeleteTask(id) {
+  if (!confirm("Tem certeza que deseja excluir esta tarefa?")) return;
+
+  try {
+    await request(`/api/tasks/${id}`, { method: "DELETE" });
+    await loadTasks();
+  } catch (error) {
+    setStatus(error.message);
+  }
+}
+
 async function handleRegister(event) {
   event.preventDefault();
   const formData = new FormData(registerForm);
