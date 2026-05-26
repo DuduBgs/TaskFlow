@@ -25,5 +25,7 @@ app.use("/api/tasks", requireAuth, tasksRouter);
 
 const port = Number(process.env.PORT || 3000);
 app.listen(port, () => {
-  console.log(`TaskFlow API listening on port ${port}`);
 });
+
+const path = require("node:path");
+const url = require("node:url");

@@ -1,6 +1,20 @@
+import dotenv from "dotenv";
+
+dotenv.config({
+  path: ".env.test",
+});
+
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createTask, deleteTask, getTask, listTasks, resetStore, updateTask } from "../src/store.js";
+
+import {
+  createTask,
+  deleteTask,
+  getTask,
+  listTasks,
+  resetStore,
+  updateTask,
+} from "../src/store.js";
 
 test("createTask stores and returns task", async () => {
   await resetStore();
