@@ -1,65 +1,110 @@
 # TaskFlow
 
-Projeto inicial para o sistema de organizacao e acompanhamento de tarefas.
+Sistema web de gerenciamento de tarefas no estilo Kanban, desenvolvido como projeto acadêmico.
 
-## Participantes
+**Participantes:** Eduardo Cunha Borges & Luiz Felipe Vilhena
 
-Eduardo Cunha Borges & Luiz Felipe Vilhena
+---
 
-## Backend (API)
-A API cobre o CRUD de tarefas em memoria, usa PostgreSQL quando `DATABASE_URL` estiver definida e possui autenticacao via JWT.
+## Sobre o projeto
 
-## Frontend (estatico)
-O frontend simples esta embutido no backend. Apos iniciar a API, abra:
-- http://localhost:3000
+O TaskFlow permite criar, organizar e acompanhar tarefas distribuídas em três colunas: **Pendente**, **Em Andamento** e **Concluída**. As tarefas podem ser arrastadas entre colunas, filtradas por texto e atribuídas a responsáveis com prazo definido.
 
-### Como rodar
-```powershell
+O frontend é servido como arquivo estático pelo próprio backend — basta subir a API e acessar `http://localhost:3000`.
+
+---
+
+## Stack
+
+- **Backend:** Node.js + Express
+- **Banco de dados:** PostgreSQL
+- **Autenticação:** JWT + bcrypt
+- **Frontend:** HTML, CSS e JavaScript puro
+- **Containerização:** Docker + Docker Compose
+- **CI:** GitHub Actions
+- **Qualidade:** SonarCloud
+
+---
+
+## Como rodar
+
+### Com Docker (recomendado)
+
+```bash
+docker-compose up --build
+```
+
+Acesse `http://localhost:3000`. O banco de dados sobe junto e as tabelas são criadas automaticamente.
+
+### Sem Docker
+
+```bash
 cd server
-npm.cmd install
-npm.cmd run dev
+npm install
 ```
 
-### Banco de dados (PostgreSQL)
-1. Crie um banco chamado `taskflow`.
-2. Execute o script SQL em [server/sql/schema.sql](server/sql/schema.sql).
-3. Defina `DATABASE_URL` no `.env` (use [server/.env.example](server/.env.example) como base).
+Copie o arquivo de exemplo e preencha as variáveis:
 
-### Autenticacao
-- Defina `JWT_SECRET` no `.env`.
-- Use `Authorization: Bearer <token>` para acessar `/api/tasks`.
-
-### Docker Compose
-Suba API e Postgres com um comando:
-```powershell
-docker compose up --build
+```bash
+cp server/.env.example server/.env
 ```
 
-O banco vai subir com usuario e senha `taskflow`. A API usa `DATABASE_URL` apontando para o servico `db`.
-
-#### Endpoints
-- GET /health
-- POST /api/auth/register
-- POST /api/auth/login
-- GET /api/auth/me
-- GET /api/tasks
-- POST /api/tasks
-- GET /api/tasks/:id
-- PUT /api/tasks/:id
-- DELETE /api/tasks/:id
-
-### Exemplo de payload
-```json
-{
-  "title": "Escrever documentacao",
-  "description": "Detalhar requisitos",
-  "dueDate": "2026-05-10",
-  "status": "em andamento",
-  "assignee": "Ana"
-}
+```env
+PORT=3000
+DATABASE_URL=postgres://usuario:senha@localhost:5432/taskflow
+JWT_SECRET=seu-segredo-aqui
 ```
 
-### Exemplo de registro/login
+Inicie o servidor:
+
+```bash
+node src/index.js
+```
+
+> Se `DATABASE_URL` não estiver definida, o sistema funciona com armazenamento em memória (dados são perdidos ao reiniciar).
+
+---
+
+## Testes
+
+```bash
+cd server
+npm test
+```
+
+---
+
+## Endpoints
+
+### Autenticação
+
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | /api/auth/register | Cadastra novo usuário |
+| POST | /api/auth/login | Autentica e retorna token JWT |
+| GET | /api/auth/me | Retorna dados do usuário logado |
+
+### Tarefas — requer `Authorization: Bearer <token>`
+
+| Método | Rota | Descrição |
+|---|---|---|
+| GET | /api/tasks | Lista todas as tarefas |
+| POST | /api/tasks | Cria nova tarefa |
+| GET | /api/tasks/:id | Busca tarefa por ID |
+| PUT | /api/tasks/:id | Atualiza tarefa |
+| DELETE | /api/tasks/:id | Remove tarefa |
+
+### Outros
+
+| Método | Rota | Descrição |
+|---|---|---|
+| GET | /health | Verifica se a API está no ar |
+
+---
+
+## Exemplos de requisição
+
+**Registro / Login**
 ```json
 {
   "name": "Ana",
@@ -68,8 +113,15 @@ O banco vai subir com usuario e senha `taskflow`. A API usa `DATABASE_URL` apont
 }
 ```
 
-### Testes
-```powershell
-cd server
-npm.cmd test
+**Criar / Atualizar tarefa**
+```json
+{
+  "title": "Escrever documentação",
+  "description": "Detalhar os requisitos do sistema",
+  "dueDate": "2026-06-10",
+  "status": "em andamento",
+  "assignee": "Ana"
+}
 ```
+
+Valores válidos para `status`: `pendente`, `em andamento`, `concluida`
