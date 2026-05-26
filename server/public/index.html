@@ -13,53 +13,64 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="page">
-      <header class="hero">
-        <div>
-          <p class="eyebrow">TaskFlow</p>
-          <h1>Gerencie tarefas com foco.</h1>
-          <p class="lead">Login, crie tarefas e acompanhe o progresso em tempo real.</p>
+
+    <!-- ── Tela de Login / Registro ── -->
+    <div class="auth-screen" id="authScreen">
+      <div class="auth-card">
+        <p class="eyebrow">TaskFlow</p>
+        <h1>Bem-vindo de volta.</h1>
+        <p class="auth-lead">Gerencie tarefas com foco.</p>
+
+        <div class="auth-tabs">
+          <button class="tab-btn active" id="tabLogin" type="button">Entrar</button>
+          <button class="tab-btn" id="tabRegister" type="button">Criar conta</button>
         </div>
-        <div class="status" id="statusBox">Desconectado</div>
+
+        <form id="loginForm" class="auth-form">
+          <label>
+            Email
+            <input type="email" name="email" required autocomplete="email" />
+          </label>
+          <label>
+            Senha
+            <input type="password" name="password" required autocomplete="current-password" />
+          </label>
+          <button type="submit">Entrar</button>
+        </form>
+
+        <form id="registerForm" class="auth-form hidden">
+          <label>
+            Nome
+            <input type="text" name="name" required autocomplete="name" />
+          </label>
+          <label>
+            Email
+            <input type="email" name="email" required autocomplete="email" />
+          </label>
+          <label>
+            Senha
+            <input type="password" name="password" required autocomplete="new-password" />
+          </label>
+          <button type="submit">Criar conta</button>
+        </form>
+
+        <p class="auth-error" id="authError"></p>
+      </div>
+    </div>
+
+    <!-- ── Tela Principal do App ── -->
+    <div class="app-screen hidden" id="appScreen">
+
+      <header class="app-header">
+        <p class="eyebrow app-logo">TaskFlow</p>
+        <div class="header-right">
+          <div class="user-avatar" id="userAvatar" title="Clique para sair">?</div>
+        </div>
       </header>
 
-      <main class="grid">
-        <section class="card">
-          <h2>Registrar</h2>
-          <form id="registerForm">
-            <label>
-              Nome
-              <input type="text" name="name" required />
-            </label>
-            <label>
-              Email
-              <input type="email" name="email" required />
-            </label>
-            <label>
-              Senha
-              <input type="password" name="password" required />
-            </label>
-            <button type="submit">Criar conta</button>
-          </form>
-        </section>
+      <div class="app-content">
 
         <section class="card">
-          <h2>Entrar</h2>
-          <form id="loginForm">
-            <label>
-              Email
-              <input type="email" name="email" required />
-            </label>
-            <label>
-              Senha
-              <input type="password" name="password" required />
-            </label>
-            <button type="submit">Entrar</button>
-          </form>
-          <button class="ghost" id="logoutButton" type="button">Sair</button>
-        </section>
-
-        <section class="card card-wide">
           <h2>Nova tarefa</h2>
           <form id="taskForm" class="task-form">
             <label>
@@ -90,10 +101,18 @@
           </form>
         </section>
 
-        <section class="card card-wide">
+        <section class="card">
           <div class="card-header">
             <h2>Quadro Kanban</h2>
-            <button class="ghost" id="refreshButton" type="button">Recarregar</button>
+            <div class="board-controls">
+              <input
+                class="search-input"
+                id="searchInput"
+                type="text"
+                placeholder="Buscar por titulo ou responsavel..."
+              />
+              <button class="ghost" id="refreshButton" type="button">Recarregar</button>
+            </div>
           </div>
           <div class="kanban">
             <div class="kanban-column">
@@ -119,9 +138,11 @@
             </div>
           </div>
         </section>
-      </main>
+
+      </div>
     </div>
 
+    <!-- ── Modal de Edicao ── -->
     <div class="modal-overlay" id="editModal">
       <div class="modal">
         <div class="modal-header">
