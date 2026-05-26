@@ -31,10 +31,10 @@ const COLUMNS = {
 
 function escape(str) {
   return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+    .replaceAll(/&/g, "&amp;")
+    .replaceAll(/</g, "&lt;")
+    .replaceAll(/>/g, "&gt;")
+    .replaceAll(/"/g, "&quot;");
 }
 
 function initials(name) {
@@ -111,7 +111,7 @@ function filterTasks(tasks) {
   return tasks.filter(
     (t) =>
       t.title.toLowerCase().includes(query) ||
-      (t.assignee && t.assignee.toLowerCase().includes(query))
+      (t.assignee?.toLowerCase().includes(query))
   );
 }
 
@@ -166,7 +166,7 @@ async function loadTasks() {
 
     const visible = filterTasks(currentTasks);
 
-    if (!visible.length) {
+    if (visible.length === 0) {
       setEmptyColumns(currentTasks.length ? "Nenhum resultado para a busca." : "Nenhuma tarefa");
     } else {
       visible.forEach((task) => {
@@ -230,7 +230,7 @@ async function handleEditTask(event) {
   const id = formData.get("id");
 
   try {
-    await request(`/api/tasks/${id}`, {
+    await request(`/api/tasks/${String(id)}`, {
       method: "PUT",
       body: JSON.stringify({
         title:       formData.get("title"),
@@ -334,10 +334,8 @@ async function handleLogout() {
 
 async function init() {
   if (!token) {
-    showAuthScreen();
-    return;
-  }
-
+  showAuthScreen();
+} else {
   try {
     const payload = await request("/api/auth/me");
     showAppScreen(payload.data.name);
@@ -346,6 +344,7 @@ async function init() {
     setToken("");
     showAuthScreen();
   }
+}
 }
 
 // ── Eventos ───────────────────────────────────────────────────────────────────
@@ -361,5 +360,3 @@ editForm.addEventListener("submit", handleEditTask);
 closeModalButton.addEventListener("click", closeEditModal);
 editModal.addEventListener("click", (e) => { if (e.target === editModal) closeEditModal(); });
 userAvatar.addEventListener("click", handleLogout);
-
-init();
