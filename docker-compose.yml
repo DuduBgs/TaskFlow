@@ -4,7 +4,7 @@ services:
     container_name: taskflow-db
     environment:
       POSTGRES_USER: taskflow
-      POSTGRES_PASSWORD: taskflow
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-taskflow}
       POSTGRES_DB: taskflow
     ports:
       - "5432:5432"
@@ -21,8 +21,8 @@ services:
     container_name: taskflow-api
     environment:
       PORT: 3000
-      DATABASE_URL: postgres://taskflow:taskflow@db:5432/taskflow
-      JWT_SECRET: taskflow-secret
+      DATABASE_URL: postgres://taskflow:${POSTGRES_PASSWORD:-taskflow}@db:5432/taskflow
+      JWT_SECRET: ${JWT_SECRET:-taskflow-secret}
     ports:
       - "3000:3000"
     depends_on:

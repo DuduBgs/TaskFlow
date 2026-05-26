@@ -31,10 +31,10 @@ const COLUMNS = {
 
 function escape(str) {
   return String(str)
-    .replaceAll(/&/g, "&amp;")
-    .replaceAll(/</g, "&lt;")
-    .replaceAll(/>/g, "&gt;")
-    .replaceAll(/"/g, "&quot;");
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
 }
 
 function initials(name) {
@@ -230,7 +230,7 @@ async function handleEditTask(event) {
   const id = formData.get("id");
 
   try {
-    await request(`/api/tasks/${String(id)}`, {
+    await request(`/api/tasks/${id}`, {
       method: "PUT",
       body: JSON.stringify({
         title:       formData.get("title"),
@@ -333,18 +333,18 @@ async function handleLogout() {
 // ── Init ──────────────────────────────────────────────────────────────────────
 
 async function init() {
-  if (!token) {
-  showAuthScreen();
-} else {
-  try {
-    const payload = await request("/api/auth/me");
-    showAppScreen(payload.data.name);
-    await loadTasks();
-  } catch {
-    setToken("");
+  if (token) {
+    try {
+      const payload = await request("/api/auth/me");
+      showAppScreen(payload.data.name);
+      await loadTasks();
+    } catch {
+      setToken("");
+      showAuthScreen();
+    }
+  } else {
     showAuthScreen();
   }
-}
 }
 
 // ── Eventos ───────────────────────────────────────────────────────────────────
