@@ -1,5 +1,4 @@
 import express from "express";
-import cors from "cors";
 import morgan from "morgan";
 import path from "path";
 import fs from "node:fs";
@@ -12,7 +11,7 @@ import { hasDatabase, pool } from "./db.js";
 const app = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-app.use(cors());
+app.disable("x-powered-by");
 app.use(express.json());
 app.use(morgan("dev"));
 
@@ -36,14 +35,13 @@ async function initDb() {
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const port = Number(process.env.PORT || 3000);
-  initDb()
-    .then(() => {
-      app.listen(port, () => {
-        console.log(`TaskFlow API listening on port ${port}`);
-      });
-    })
-    .catch((err) => {
-      console.error("Failed to initialize database:", err);
-      process.exit(1);
-    });
+  try {
+    await initDb();
+  } catch (err) {
+    console.error("Failed to initialize database:", err);
+    process.exit(1);
+  }
+  app.listen(port, () => {
+    console.log(`TaskFlow API listening on port ${port}`);
+  });
 }
