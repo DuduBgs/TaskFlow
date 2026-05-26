@@ -1,10 +1,6 @@
 import jwt from "jsonwebtoken";
 
-if (!process.env.JWT_SECRET) {
-  throw new Error("JWT_SECRET environment variable is required");
-}
-
-const jwtSecret = process.env.JWT_SECRET;
+const jwtSecret = process.env.JWT_SECRET || "dev-secret-local";
 
 export function createToken(payload) {
   return jwt.sign(payload, jwtSecret, { expiresIn: "7d" });
