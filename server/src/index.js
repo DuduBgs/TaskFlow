@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import path from "path";
-import { fileURLToPath } from "url";
+import { fileURLToPath } from "node:url";
 import tasksRouter from "./routes/tasks.js";
 import authRouter from "./routes/auth.js";
 import { requireAuth } from "./middleware/auth.js";
