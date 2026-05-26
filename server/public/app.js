@@ -5,8 +5,20 @@ const logoutButton = document.getElementById("logoutButton");
 const taskForm = document.getElementById("taskForm");
 const refreshButton = document.getElementById("refreshButton");
 const tasksContainer = document.getElementById("tasks");
+const editModal = document.getElementById("editModal");
+const editForm = document.getElementById("editForm");
+const closeModalButton = document.getElementById("closeModalButton");
 
 let token = localStorage.getItem("taskflow_token") || "";
+let currentTasks = [];
+
+function escape(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
 
 function setStatus(message, isAuthed = false) {
   statusBox.textContent = message;
@@ -45,27 +57,94 @@ async function loadTasks() {
 
   try {
     const payload = await request("/api/tasks");
-    const tasks = payload.data || [];
+    currentTasks = payload.data || [];
 
-    if (!tasks.length) {
+    if (!currentTasks.length) {
       tasksContainer.innerHTML = "<p>Nenhuma tarefa cadastrada.</p>";
       return;
     }
 
-    tasksContainer.innerHTML = tasks
+    tasksContainer.innerHTML = currentTasks
       .map(
         (task) => `
       <div class="task">
-        <strong>${task.title}</strong>
-        <small>${task.status} ${task.dueDate ? "| " + task.dueDate : ""}</small>
-        <span>${task.description || "Sem descricao"}</span>
-        <small>${task.assignee ? "Responsavel: " + task.assignee : "Sem responsavel"}</small>
+        <div class="task-header">
+          <strong>${escape(task.title)}</strong>
+          <div class="task-actions">
+            <button class="ghost btn-edit" data-id="${task.id}" type="button">Editar</button>
+            <button class="ghost btn-delete" data-id="${task.id}" type="button">Excluir</button>
+          </div>
+        </div>
+        <small>${escape(task.status)}${task.dueDate ? " | " + escape(task.dueDate) : ""}</small>
+        <span>${escape(task.description || "Sem descricao")}</span>
+        <small>${task.assignee ? "Responsavel: " + escape(task.assignee) : "Sem responsavel"}</small>
       </div>
     `
       )
       .join("");
+
+    tasksContainer.querySelectorAll(".btn-edit").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const task = currentTasks.find((t) => String(t.id) === btn.dataset.id);
+        if (task) openEditModal(task);
+      });
+    });
+
+    tasksContainer.querySelectorAll(".btn-delete").forEach((btn) => {
+      btn.addEventListener("click", () => handleDeleteTask(btn.dataset.id));
+    });
   } catch (error) {
     tasksContainer.innerHTML = `<p>${error.message}</p>`;
+  }
+}
+
+function openEditModal(task) {
+  editForm.elements.id.value = task.id;
+  editForm.elements.title.value = task.title;
+  editForm.elements.description.value = task.description || "";
+  editForm.elements.dueDate.value = task.dueDate || "";
+  editForm.elements.status.value = task.status;
+  editForm.elements.assignee.value = task.assignee || "";
+  editModal.classList.add("open");
+}
+
+function closeEditModal() {
+  editModal.classList.remove("open");
+  editForm.reset();
+}
+
+async function handleEditTask(event) {
+  event.preventDefault();
+  const formData = new FormData(editForm);
+  const id = formData.get("id");
+
+  try {
+    await request(`/api/tasks/${id}`, {
+      method: "PUT",
+      body: JSON.stringify({
+        title: formData.get("title"),
+        description: formData.get("description"),
+        dueDate: formData.get("dueDate"),
+        status: formData.get("status"),
+        assignee: formData.get("assignee")
+      })
+    });
+
+    closeEditModal();
+    await loadTasks();
+  } catch (error) {
+    setStatus(error.message);
+  }
+}
+
+async function handleDeleteTask(id) {
+  if (!confirm("Tem certeza que deseja excluir esta tarefa?")) return;
+
+  try {
+    await request(`/api/tasks/${id}`, { method: "DELETE" });
+    await loadTasks();
+  } catch (error) {
+    setStatus(error.message);
   }
 }
 
@@ -116,6 +195,7 @@ async function handleLogin(event) {
 
 async function handleLogout() {
   setToken("");
+  currentTasks = [];
   tasksContainer.innerHTML = "<p>Desconectado.</p>";
   setStatus("Desconectado");
 }
@@ -158,5 +238,10 @@ loginForm.addEventListener("submit", handleLogin);
 logoutButton.addEventListener("click", handleLogout);
 taskForm.addEventListener("submit", handleCreateTask);
 refreshButton.addEventListener("click", loadTasks);
+editForm.addEventListener("submit", handleEditTask);
+closeModalButton.addEventListener("click", closeEditModal);
+editModal.addEventListener("click", (e) => {
+  if (e.target === editModal) closeEditModal();
+});
 
 init();
