@@ -7,6 +7,7 @@ RUN npm ci
 
 COPY src ./src
 COPY sql ./sql
+COPY public ./public
 
 EXPOSE 3000
 
